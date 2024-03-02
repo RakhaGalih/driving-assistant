@@ -5,6 +5,7 @@ import 'package:sdla/components/appbar.dart';
 import 'package:sdla/components/appbar_button.dart';
 import 'package:sdla/components/button.dart';
 import 'package:sdla/constants/constant.dart';
+import 'package:sdla/screens/home/notification.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -136,12 +137,18 @@ class _HomePageState extends State<HomePage> {
                       )
                     ],
                   ),
-                  const AppBarButton(
-                    child: Stack(
+                  AppBarButton(
+                    child: const Stack(
                       children: [
                         Icon(Icons.notifications),
                       ],
                     ),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Notifcation()));
+                    },
                   )
                 ],
               ),

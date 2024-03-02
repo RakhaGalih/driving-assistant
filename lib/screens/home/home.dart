@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sdla/constants/constant.dart';
+import 'package:sdla/screens/home/history.dart';
 import 'package:sdla/screens/home/homepage.dart';
 import 'package:sdla/screens/home/profile.dart';
 
@@ -20,7 +21,7 @@ class _HomeState extends State<Home> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     HomePage(),
-    HomePage(),
+    Riwayat(),
     Profile()
   ];
 

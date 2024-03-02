@@ -40,3 +40,41 @@ class BackGroundAppBar extends StatelessWidget {
     );
   }
 }
+
+class GradientAppBar extends StatelessWidget {
+  const GradientAppBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+      decoration: const BoxDecoration(gradient: kGradientBlue),
+      child: SafeArea(
+          bottom: false,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: const SizedBox(
+                  width: 20,
+                  child: Icon(
+                    Icons.arrow_back,
+                    color: kWhite,
+                  ),
+                ),
+              ),
+              Text(
+                'Riwayat',
+                style: kSemiBoldTextStyle.copyWith(fontSize: 16, color: kWhite),
+              ),
+              const SizedBox(
+                width: 20,
+              )
+            ],
+          )),
+    );
+  }
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sdla/components/appbar_button.dart';
 import 'package:sdla/components/button.dart';
+import 'package:sdla/components/container.dart';
 import 'package:sdla/constants/constant.dart';
 
 class Profile extends StatelessWidget {
@@ -60,20 +61,7 @@ class Profile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 45, horizontal: 20),
             child: Column(
               children: [
-                Container(
-                  margin: const EdgeInsets.only(bottom: 45),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-                  decoration: BoxDecoration(
-                      color: const Color(0xFFFDFEFF),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black.withOpacity(0.25),
-                            spreadRadius: 1,
-                            offset: const Offset(1, 4),
-                            blurRadius: 4)
-                      ]),
+                ShadowContainer(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -171,6 +159,9 @@ class Profile extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
+                const SizedBox(
+                  height: 45,
                 ),
                 MainButton(
                   icon: Icons.logout,

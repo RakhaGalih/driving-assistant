@@ -20,6 +20,11 @@ const kRegularTextStyle = TextStyle(fontWeight: FontWeight.w400);
 const kMediumTextStyle = TextStyle(fontWeight: FontWeight.w500);
 const kSemiBoldTextStyle = TextStyle(fontWeight: FontWeight.w600);
 const kBoldTextStyle = TextStyle(fontWeight: FontWeight.w700);
+BoxShadow kBasicBoxShadow = BoxShadow(
+    color: Colors.black.withOpacity(0.25),
+    spreadRadius: 1,
+    offset: const Offset(1, 4),
+    blurRadius: 4);
 InputDecoration kTextFieldInputDecoration = InputDecoration(
   focusColor: kBlue,
   hoverColor: kBlue,
