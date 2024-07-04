@@ -1,20 +1,28 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+
 import 'package:sdla/constants/constant.dart';
 
 class AppBarButton extends StatelessWidget {
   final Widget child;
+  final double? width;
+  final double? height;
   final Function()? onTap;
-  const AppBarButton({Key? key, required this.child, this.onTap})
-      : super(key: key);
+  const AppBarButton({
+    Key? key,
+    required this.child,
+    this.width,
+    this.height,
+    this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 48,
-        height: 48,
+        width: width ?? 48,
+        height: height ?? 48,
         alignment: Alignment.center,
         decoration:
             BoxDecoration(color: kWhite, shape: BoxShape.circle, boxShadow: [

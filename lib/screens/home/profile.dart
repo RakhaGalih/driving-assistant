@@ -3,9 +3,54 @@ import 'package:sdla/components/appbar_button.dart';
 import 'package:sdla/components/button.dart';
 import 'package:sdla/components/container.dart';
 import 'package:sdla/constants/constant.dart';
+import 'package:sdla/screens/auth/login.dart';
+import 'package:sdla/screens/pages/update_profile.dart';
+import 'package:sdla/services/converter.dart';
+import 'package:sdla/services/http_service.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
   const Profile({super.key});
+
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  String nama = "loading...";
+  String image = "null";
+  String? tanggal;
+  int totalDurasi = 0;
+  int durasiTerakhir = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      var response = await getUserDetails();
+      var tripResponse = await getUserTrip();
+      print(response['name']);
+      nama = response['name'];
+      image = response['image'];
+
+      print(tripResponse['data']['total_duration']);
+      totalDurasi = tripResponse['data']['total_duration'];
+      List<dynamic> trips = tripResponse['data']['trips'];
+      print(trips[trips.length - 2]);
+      print(trips[trips.length - 2]['duration']);
+      durasiTerakhir = trips[trips.length - 2]['duration'];
+      print("$durasiTerakhir $totalDurasi $nama $image");
+      tanggal = trips[trips.length - 2]['start_time'];
+      setState(() {
+      });
+    } catch (e) {
+      nama = "Fetch data error";
+      print('Fetch data error: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,29 +72,45 @@ class Profile extends StatelessWidget {
                         const SizedBox(
                           height: 10,
                         ),
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                  image: AssetImage('images/profile.png'),
-                                  fit: BoxFit.fill)),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(50),
+                          child: (image == "null")
+                              ? const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(20),
+                                    child: CircularProgressIndicator(
+                                      color: kWhite,
+                                    ),
+                                  ),
+                                )
+                              : MyNetworkImage(
+                                  imageURL: image,
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
                         ),
                         const SizedBox(
                           height: 10,
                         ),
                         Text(
-                          'Bagas Saputra',
+                          nama,
                           style: kSemiBoldTextStyle.copyWith(
                               fontSize: 20, color: kWhite),
                         )
                       ],
                     ),
                   ),
-                  const Align(
+                  Align(
                     alignment: Alignment.topRight,
-                    child: AppBarButton(child: Icon(Icons.settings)),
+                    child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const UpdateProfile()));
+                        },
+                        child: const AppBarButton(child: Icon(Icons.settings))),
                   )
                 ],
               ),
@@ -69,13 +130,14 @@ class Profile extends StatelessWidget {
                         'Aktivitas',
                         style: kSemiBoldTextStyle.copyWith(fontSize: 20),
                       ),
+                      /*
                       const SizedBox(
                         height: 5,
                       ),
                       Text(
                         'Total Perjalanan 356 Km',
                         style: kRegularTextStyle.copyWith(fontSize: 12),
-                      ),
+                      ),*/
                       const SizedBox(
                         height: 20,
                       ),
@@ -92,7 +154,7 @@ class Profile extends StatelessWidget {
                           Column(
                             children: [
                               Text(
-                                '56j 24M',
+                                targetConvert(totalDurasi),
                                 style:
                                     kSemiBoldTextStyle.copyWith(fontSize: 15),
                               ),
@@ -102,6 +164,7 @@ class Profile extends StatelessWidget {
                               ),
                             ],
                           ),
+                          /*
                           const SizedBox(
                             width: 10,
                           ),
@@ -134,6 +197,7 @@ class Profile extends StatelessWidget {
                               ),
                             ],
                           )
+                          */
                         ],
                       ),
                       const SizedBox(
@@ -147,14 +211,14 @@ class Profile extends StatelessWidget {
                         height: 5,
                       ),
                       Text(
-                        'Kamis 21 Februari 2024',
+                        convertTanggal(tanggal),
                         style: kSemiBoldTextStyle.copyWith(fontSize: 12),
                       ),
                       const SizedBox(
                         height: 5,
                       ),
                       Text(
-                        '18j 24m',
+                        targetConvert(durasiTerakhir),
                         style: kRegularTextStyle.copyWith(fontSize: 12),
                       ),
                     ],
@@ -166,7 +230,18 @@ class Profile extends StatelessWidget {
                 MainButton(
                   icon: Icons.logout,
                   title: 'Logout',
-                  onTap: () {},
+                  onTap: () async {
+                    try {
+                      await logout();
+                      print('berhasil logout!');
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Login()));
+                    } catch (e) {
+                      print(e);
+                    }
+                  },
                   gradient: kGradientRed,
                 )
               ],

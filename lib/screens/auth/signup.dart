@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sdla/components/appbar.dart';
 import 'package:sdla/components/button.dart';
 import 'package:sdla/constants/constant.dart';
+import 'package:sdla/screens/home/home.dart';
+import 'package:sdla/services/http_service.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -11,7 +13,59 @@ class SignUp extends StatefulWidget {
 }
 
 class _LoginState extends State<SignUp> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
   bool _isObscure = true;
+  String error = "";
+
+  Future<void> _signUp() async {
+    if (passwordController.text == confirmPasswordController.text) {
+      Map<String, dynamic> response = {};
+      try {
+        Map<String, dynamic> data = {
+          'name': nameController.text,
+          'email': emailController.text,
+          'password': passwordController.text,
+        };
+        response = await postData("/api/admin/registerakun", data);
+        print('berhasil daftar!');
+        await _login();
+        print('berhasil login!');
+      } catch (e) {
+        print(response);
+        setState(() {
+          error = "Akun tersebut sudah ada";
+        });
+        print('Register error: $e');
+      }
+    } else {
+      print('sigma');
+      setState(() {
+        error = "password tidak dapat dikonfirmasi";
+      });
+    }
+  }
+
+  Future<void> _login() async {
+    Map<String, dynamic> response = {};
+    try {
+      Map<String, dynamic> data = {
+        'email': emailController.text,
+        'password': passwordController.text,
+      };
+      response = await postData("/api/admin/login", data);
+      token = response['token']; // Ambil token dari response
+
+      print('berhasil login!');
+    } catch (e) {
+      error = "${response['email'][0]}\n${response['password'][0]}";
+      setState(() {});
+      print('Login error: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -41,6 +95,15 @@ class _LoginState extends State<SignUp> {
                           height: 20,
                         ),
                         TextField(
+                          controller: nameController,
+                          decoration: kTextFieldInputDecoration.copyWith(
+                              hintText: 'Username'),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        TextField(
+                          controller: emailController,
                           decoration: kTextFieldInputDecoration.copyWith(
                               hintText: 'Email'),
                         ),
@@ -48,6 +111,7 @@ class _LoginState extends State<SignUp> {
                           height: 20,
                         ),
                         TextField(
+                          controller: passwordController,
                           obscureText: _isObscure,
                           decoration: kTextFieldInputDecoration.copyWith(
                               suffixIcon: GestureDetector(
@@ -67,6 +131,7 @@ class _LoginState extends State<SignUp> {
                           height: 20,
                         ),
                         TextField(
+                          controller: confirmPasswordController,
                           obscureText: _isObscure,
                           decoration: kTextFieldInputDecoration.copyWith(
                               hintText: 'Konfirmasi Password',
@@ -88,9 +153,18 @@ class _LoginState extends State<SignUp> {
                         ),
                         SecondaryButton(
                             title: 'Sign Up',
-                            onTap: () {
-                              Navigator.of(context).pop();
-                            })
+                            onTap: () async {
+                              await _signUp();
+                            }),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Text(
+                          error,
+                          textAlign: TextAlign.center,
+                          style: kSemiBoldTextStyle.copyWith(
+                              color: const Color(0xFFCD1A1A)),
+                        ),
                       ],
                     ),
                   ),

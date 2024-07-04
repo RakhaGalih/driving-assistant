@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sdla/components/appbar_button.dart';
-import 'package:sdla/components/calendar.dart';
+import 'package:sdla/components/calendar.dart'; // Pastikan untuk mengimport MyCalendar atau sesuaikan dengan nama yang benar
 import 'package:sdla/constants/constant.dart';
 import 'package:sdla/screens/home/notification.dart';
 
@@ -33,11 +33,6 @@ class Riwayat extends StatelessWidget {
                         const SizedBox(
                           height: 5,
                         ),
-                        Text(
-                          'Total Perjalanan 356 Km',
-                          style: kRegularTextStyle.copyWith(
-                              fontSize: 12, color: kWhite),
-                        ),
                         const SizedBox(
                           height: 20,
                         ),
@@ -58,34 +53,6 @@ class Riwayat extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            Column(
-                              children: [
-                                Text(
-                                  '100',
-                                  style: kSemiBoldTextStyle.copyWith(
-                                      fontSize: 15, color: kWhite),
-                                ),
-                                Text(
-                                  'Km/Jam',
-                                  style: kRegularTextStyle.copyWith(
-                                      fontSize: 12, color: kWhite),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  '356',
-                                  style: kSemiBoldTextStyle.copyWith(
-                                      fontSize: 15, color: kWhite),
-                                ),
-                                Text(
-                                  'Kilometer',
-                                  style: kRegularTextStyle.copyWith(
-                                      fontSize: 12, color: kWhite),
-                                ),
-                              ],
-                            )
                           ],
                         ),
                       ],
@@ -110,7 +77,7 @@ class Riwayat extends StatelessWidget {
           const SizedBox(
             height: 25,
           ),
-          const MyCalendar()
+          const MyCalendar(),
         ],
       ),
     );
