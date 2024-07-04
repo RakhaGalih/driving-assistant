@@ -1,14 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sdla/components/appbar_button.dart';
-import 'package:sdla/components/calendar.dart'; // Pastikan untuk mengimport MyCalendar atau sesuaikan dengan nama yang benar
+import 'package:sdla/components/calendar.dart';
 import 'package:sdla/constants/constant.dart';
 import 'package:sdla/screens/home/notification.dart';
+import 'package:sdla/services/converter.dart';
+import 'package:sdla/services/provider.dart';
 
-class Riwayat extends StatelessWidget {
+class Riwayat extends StatefulWidget {
   const Riwayat({super.key});
 
   @override
+  State<Riwayat> createState() => _RiwayatState();
+}
+
+class _RiwayatState extends State<Riwayat> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Provider.of<SelectedDateProvider>(context, listen: false).fetchDataTrip();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final SelectedDateProvider selectedDateProvider =
+        Provider.of<SelectedDateProvider>(context);
     return Scaffold(
       body: Column(
         children: [
@@ -33,6 +50,18 @@ class Riwayat extends StatelessWidget {
                         const SizedBox(
                           height: 5,
                         ),
+                        /*
+                        Text(
+                          'Total Perjalanan 356 Km',
+                          style: kRegularTextStyle.copyWith(
+                              fontSize: 12, color: kWhite),
+                        ),*/
+                        Text(
+                          convertTanggal(
+                              selectedDateProvider.selectedDay.toString()),
+                          style: kRegularTextStyle.copyWith(
+                              fontSize: 12, color: kWhite),
+                        ),
                         const SizedBox(
                           height: 20,
                         ),
@@ -42,7 +71,7 @@ class Riwayat extends StatelessWidget {
                             Column(
                               children: [
                                 Text(
-                                  '56j 24M',
+                                  targetConvert(selectedDateProvider.durasi),
                                   style: kSemiBoldTextStyle.copyWith(
                                       fontSize: 15, color: kWhite),
                                 ),
@@ -53,6 +82,35 @@ class Riwayat extends StatelessWidget {
                                 ),
                               ],
                             ),
+                            /*
+                            Column(
+                              children: [
+                                Text(
+                                  '100',
+                                  style: kSemiBoldTextStyle.copyWith(
+                                      fontSize: 15, color: kWhite),
+                                ),
+                                Text(
+                                  'Km/Jam',
+                                  style: kRegularTextStyle.copyWith(
+                                      fontSize: 12, color: kWhite),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  '356',
+                                  style: kSemiBoldTextStyle.copyWith(
+                                      fontSize: 15, color: kWhite),
+                                ),
+                                Text(
+                                  'Kilometer',
+                                  style: kRegularTextStyle.copyWith(
+                                      fontSize: 12, color: kWhite),
+                                ),
+                              ],
+                            )*/
                           ],
                         ),
                       ],
@@ -77,7 +135,7 @@ class Riwayat extends StatelessWidget {
           const SizedBox(
             height: 25,
           ),
-          const MyCalendar(),
+          const MyCalendar()
         ],
       ),
     );

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:sdla/services/converter.dart';
 import 'package:sdla/services/http_service.dart';
 
 class TimerService extends ChangeNotifier {
@@ -116,11 +117,27 @@ class TimerService extends ChangeNotifier {
 
 class SelectedDateProvider with ChangeNotifier {
   DateTime _selectedDay = DateTime.now();
+  int _durasi = 0;
 
   DateTime get selectedDay => _selectedDay;
+  int get durasi => _durasi;
 
   void setSelectedDay(DateTime newDay) {
     _selectedDay = newDay;
+    fetchDataTrip(); // Don't await here to allow the UI to remain responsive
+    notifyListeners();
+  }
+
+  Future<void> fetchDataTrip() async {
+    try {
+      var tripResponse = await getUserTrip();
+      Map<String, dynamic> dailyDuration =
+          tripResponse["data"]["daily_durations"];
+      _durasi = dailyDuration[dateTimeConverter(_selectedDay)] ?? 0;
+    } catch (e) {
+      print('Fetch data error: $e');
+      _durasi = 0; // Handle error condition, set _durasi to 0 or any default value
+    }
     notifyListeners();
   }
 }

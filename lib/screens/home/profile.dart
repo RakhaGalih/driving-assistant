@@ -32,17 +32,12 @@ class _ProfileState extends State<Profile> {
     try {
       var response = await getUserDetails();
       var tripResponse = await getUserTrip();
-      print(response['name']);
       nama = response['name'];
       image = response['image'];
 
-      print(tripResponse['data']['total_duration']);
       totalDurasi = tripResponse['data']['total_duration'];
       List<dynamic> trips = tripResponse['data']['trips'];
-      print(trips[trips.length - 2]);
-      print(trips[trips.length - 2]['duration']);
       durasiTerakhir = trips[trips.length - 2]['duration'];
-      print("$durasiTerakhir $totalDurasi $nama $image");
       tanggal = trips[trips.length - 2]['start_time'];
       setState(() {
       });
@@ -159,7 +154,7 @@ class _ProfileState extends State<Profile> {
                                     kSemiBoldTextStyle.copyWith(fontSize: 15),
                               ),
                               Text(
-                                'Durasi',
+                                'Total Durasi',
                                 style: kRegularTextStyle.copyWith(fontSize: 12),
                               ),
                             ],

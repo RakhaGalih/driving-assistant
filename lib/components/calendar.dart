@@ -10,7 +10,8 @@ class MyCalendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SelectedDateProvider selectedDateProvider = Provider.of<SelectedDateProvider>(context);
+    final SelectedDateProvider selectedDateProvider =
+        Provider.of<SelectedDateProvider>(context);
 
     return Padding(
       padding: const EdgeInsets.all(20.0),
