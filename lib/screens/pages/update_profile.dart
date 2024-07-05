@@ -22,8 +22,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
 
   final ImagePicker _picker = ImagePicker();
   File? _imageFile;
-  final String name = 'daffa12';
-  final String email = 'daffa12@gmail.com';
+  String name = 'daffa12';
+  String email = 'daffa123@gmail.com';
+  String error = "";
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -35,10 +36,27 @@ class _UpdateProfileState extends State<UpdateProfile> {
   }
 
   Future<void> _uploadImage() async {
-    if (_imageFile != null) {
-      await updateDataUser(name, email, imageFile: _imageFile);
-    } else {
-      await updateDataUser(name, email);
+    error = "";
+    setState(() {});
+    Map<String, dynamic> response = {};
+    name = nameController.text;
+    email = emailController.text;
+    try {
+      if (_imageFile != null) {
+        response = await updateDataUser(name, email, imageFile: _imageFile);
+      } else {
+        response = await updateDataUser(name, email);
+      }
+      if (response['success']) {
+        if (mounted) {
+          Navigator.pop(context, 'update');
+        }
+      }
+    } catch (e) {
+      setState(() {
+        error = "error";
+        error = response['email'][0];
+      });
     }
   }
 
@@ -51,13 +69,16 @@ class _UpdateProfileState extends State<UpdateProfile> {
   void _fetchUserData() async {
     try {
       var response = await getUserDetails();
-      nama = response['name'];
-      image = response['image'];
-      nameController = TextEditingController(text: response['name']);
-      emailController = TextEditingController(text: response['email']);
-      setState(() {});
+      setState(() {
+        nama = response['name'];
+        image = response['image'];
+        nameController.text = response['name'];
+        emailController.text = response['email'];
+      });
     } catch (e) {
-      nama = "Fetch data error";
+      setState(() {
+        nama = "Fetch data error";
+      });
       print('Fetch data error: $e');
     }
   }
@@ -88,23 +109,29 @@ class _UpdateProfileState extends State<UpdateProfile> {
                           child: Stack(
                             children: [
                               ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: (image == "null")
-                                    ? const Center(
-                                        child: Padding(
-                                          padding: EdgeInsets.all(20),
-                                          child: CircularProgressIndicator(
-                                            color: kWhite,
+                                  borderRadius: BorderRadius.circular(50),
+                                  child: (image == "null")
+                                      ? const Center(
+                                          child: Padding(
+                                            padding: EdgeInsets.all(20),
+                                            child: CircularProgressIndicator(
+                                              color: kWhite,
+                                            ),
                                           ),
-                                        ),
-                                      )
-                                    : MyNetworkImage(
-                                        imageURL: image,
-                                        width: 100,
-                                        height: 100,
-                                        fit: BoxFit.cover,
-                                      ),
-                              ),
+                                        )
+                                      : (_imageFile == null)
+                                          ? MyNetworkImage(
+                                              imageURL: image,
+                                              width: 100,
+                                              height: 100,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.file(
+                                              _imageFile!,
+                                              width: 120,
+                                              height: 120,
+                                              fit: BoxFit.cover,
+                                            )),
                               Align(
                                 alignment: Alignment.bottomRight,
                                 child: GestureDetector(
@@ -126,7 +153,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                           nama,
                           style: kSemiBoldTextStyle.copyWith(
                               fontSize: 20, color: kWhite),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -164,7 +191,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 ),
                 MainButton(
                   title: 'Save',
-                  onTap: _uploadImage,
+                  onTap: () async {
+                    await _uploadImage();
+                  },
                   gradient: kGradientBlue,
                 ),
                 const SizedBox(
@@ -175,7 +204,16 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   onTap: () {
                     Navigator.pop(context);
                   },
-                )
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                Text(
+                  error,
+                  textAlign: TextAlign.center,
+                  style: kSemiBoldTextStyle.copyWith(
+                      color: const Color(0xFFCD1A1A)),
+                ),
               ],
             ),
           )

@@ -39,11 +39,23 @@ class _ProfileState extends State<Profile> {
       List<dynamic> trips = tripResponse['data']['trips'];
       durasiTerakhir = trips[trips.length - 2]['duration'];
       tanggal = trips[trips.length - 2]['start_time'];
-      setState(() {
-      });
+      setState(() {});
     } catch (e) {
       nama = "Fetch data error";
       print('Fetch data error: $e');
+    }
+  }
+
+  Future<void> _navigateAndDisplayResult(BuildContext context) async {
+    final result = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const UpdateProfile()));
+
+    // Check what was returned and act accordingly
+    if (result != null) {
+      await _fetchUserData();
+      if (mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -99,11 +111,8 @@ class _ProfileState extends State<Profile> {
                   Align(
                     alignment: Alignment.topRight,
                     child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const UpdateProfile()));
+                        onTap: () async {
+                          await _navigateAndDisplayResult(context);
                         },
                         child: const AppBarButton(child: Icon(Icons.settings))),
                   )

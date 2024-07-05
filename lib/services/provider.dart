@@ -1,14 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sdla/services/converter.dart';
 import 'package:sdla/services/http_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TimerService extends ChangeNotifier {
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
+  TimerService(this.flutterLocalNotificationsPlugin);
   bool _isStarted = false;
   bool _isPaused = false;
   int _time = 0;
-  final int _target = 10;
+  final int _target = 25200;
   int? _remainding;
   double _ratio = 0;
 
@@ -19,6 +24,7 @@ class TimerService extends ChangeNotifier {
   int _minutesRemainder = 0;
   int _secondsRemainder = 0;
   late Timer _timer;
+  
 
   bool get isStarted => _isStarted;
   bool get isPaused => _isPaused;
@@ -47,6 +53,7 @@ class TimerService extends ChangeNotifier {
             await stopTimer();
             timer.cancel();
             _isPaused = true;
+            await _showNotification(); // Call notification method
           } else {
             _time++;
             _remainding = _target - _time;
@@ -108,6 +115,43 @@ class TimerService extends ChangeNotifier {
     notifyListeners();
   }
 
+  
+  Future<void> _showNotification() async {
+    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+      'pomodoro_channel',
+      'Pomodoro Notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+    var iOSPlatformChannelSpecifics = const DarwinNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      'Pomodoro Timer',
+      'Time to take a break!',
+      platformChannelSpecifics,
+    );
+    _saveNotification();
+  }
+
+  Future<void> _saveNotification() async {
+    final prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now();
+    List<String> notifications = prefs.getStringList('notifications') ?? [];
+    notifications.add(now.toIso8601String());
+    await prefs.setStringList('notifications', notifications);
+  }
+
+  Future<List<DateTime>> getNotifications() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> notifications = prefs.getStringList('notifications') ?? [];
+    return notifications
+        .map((notification) => DateTime.parse(notification))
+        .toList();
+  }
+
   @override
   void dispose() {
     _timer.cancel();
@@ -136,7 +180,8 @@ class SelectedDateProvider with ChangeNotifier {
       _durasi = dailyDuration[dateTimeConverter(_selectedDay)] ?? 0;
     } catch (e) {
       print('Fetch data error: $e');
-      _durasi = 0; // Handle error condition, set _durasi to 0 or any default value
+      _durasi =
+          0; // Handle error condition, set _durasi to 0 or any default value
     }
     notifyListeners();
   }

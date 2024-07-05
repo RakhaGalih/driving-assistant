@@ -143,52 +143,59 @@ Future<Map<String, dynamic>> logout() async {
   }
 }
 
+// Fungsi untuk mengunduh file dari URL
 Future<File> downloadFile(String url, String filename) async {
-  // Membuat request HTTP untuk mengunduh file
   var response = await http.get(Uri.parse(url));
 
-  // Mendapatkan direktori penyimpanan sementara
   var dir = await getTemporaryDirectory();
 
-  // Menyimpan file ke direktori sementara
   var file = File(path.join(dir.path, filename));
   await file.writeAsBytes(response.bodyBytes);
 
   return file;
 }
 
-Future<void> updateDataUser(String name, String email,
+// Fungsi untuk memperbarui data pengguna
+Future<Map<String, dynamic>> updateDataUser(String name, String email,
     {File? imageFile}) async {
-  var uri = Uri.parse("$apiURL/api/admin/users/3");
+  int id = 0;
+  try {
+    var response = await getUserDetails();
+    id = response['id'];
+  } catch (e) {
+    print('Fetch data error: $e');
+    return {};
+  }
 
-  // Membuat request Multipart
+  var uri = Uri.parse("$apiURL/api/admin/users/$id");
+
   var request = http.MultipartRequest('POST', uri);
 
-  // Menambahkan header ke request
   request.headers['Accept'] = 'application/json';
   request.headers['Authorization'] = 'Bearer $token';
 
-  // Menambahkan field data ke request
   request.fields['name'] = name;
   request.fields['email'] = email;
   request.fields['_method'] = 'PATCH';
 
-  // Mendapatkan detail pengguna
-  var userDetails = await getUserDetails();
+  // Jika tidak ada file gambar yang diberikan, unduh gambar dari URL
   if (imageFile == null) {
-    // Jika tidak ada file gambar yang diberikan, unduh gambar dari URL
-    String imageUrl = userDetails['image'];
-    imageFile = await downloadFile(imageUrl, 'default_image.jpg');
+    try {
+      var userDetails = await getUserDetails();
+      String imageUrl = userDetails['image'];
+      imageFile = await downloadFile(imageUrl, 'default_image.jpg');
+    } catch (e) {
+      print('Error downloading file: $e');
+      return {};
+    }
   }
 
-  // Mendapatkan tipe MIME dari file gambar
   var mimeTypeData = lookupMimeType(imageFile.path)?.split('/');
 
-  // Membuat MultipartFile dari file gambar
   var fileStream = http.ByteStream(imageFile.openRead());
   var fileLength = await imageFile.length();
   var multipartFile = http.MultipartFile(
-    'image', // Nama field pada API
+    'image',
     fileStream,
     fileLength,
     filename: path.basename(imageFile.path),
@@ -197,21 +204,24 @@ Future<void> updateDataUser(String name, String email,
         : null,
   );
 
-  // Menambahkan file ke request
   request.files.add(multipartFile);
 
+  Map<String, dynamic> responseBody = {};
   try {
-    // Mengirim request
     var response = await request.send();
 
-    // Mengecek status response
     if (response.statusCode == 200) {
       print('Upload successful');
     } else {
       print('Upload failed with status: ${response.statusCode}');
     }
+
+    responseBody = jsonDecode(await response.stream.bytesToString());
+    print('Response body: $responseBody');
+    return responseBody;
   } catch (e) {
     print('Upload error: $e');
+    return responseBody;
   }
 }
 
