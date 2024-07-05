@@ -6,10 +6,39 @@ import 'package:sdla/components/button.dart';
 import 'package:sdla/constants/constant.dart';
 import 'package:sdla/screens/home/notification.dart';
 import 'package:sdla/services/converter.dart';
+import 'package:sdla/services/http_service.dart';
 import 'package:sdla/services/provider.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String nama = "loading...";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      var response = await getUserDetails();
+
+      setState(() {
+        nama = response['name'];
+      });
+    } catch (e) {
+      setState(() {
+        nama = "Fetch data error";
+      });
+      print('Fetch data error: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +64,7 @@ class HomePage extends StatelessWidget {
                               fontSize: 16, color: kWhite),
                         ),
                         Text(
-                          'Rakha',
+                          nama,
                           style: kSemiBoldTextStyle.copyWith(
                               fontSize: 32, color: kWhite),
                         ),

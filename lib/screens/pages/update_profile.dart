@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:sdla/components/appbar_button.dart';
 import 'package:sdla/components/button.dart';
 import 'package:sdla/constants/constant.dart';
@@ -19,6 +20,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
   TextEditingController emailController = TextEditingController();
   String nama = "loading...";
   String image = "null";
+  bool _showSpinner = false;
 
   final ImagePicker _picker = ImagePicker();
   File? _imageFile;
@@ -37,7 +39,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
 
   Future<void> _uploadImage() async {
     error = "";
-    setState(() {});
+    setState(() {
+      _showSpinner = true;
+    });
     Map<String, dynamic> response = {};
     name = nameController.text;
     email = emailController.text;
@@ -58,6 +62,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
         error = response['email'][0];
       });
     }
+    setState(() {
+      _showSpinner = false;
+    });
   }
 
   @override
@@ -86,138 +93,146 @@ class _UpdateProfileState extends State<UpdateProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            width: double.infinity,
-            height: 242,
-            decoration: const BoxDecoration(gradient: kGradientBlue),
-            child: SafeArea(
-              child: Stack(
-                children: [
-                  Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        SizedBox(
-                          width: 100,
-                          height: 100,
-                          child: Stack(
-                            children: [
-                              ClipRRect(
-                                  borderRadius: BorderRadius.circular(50),
-                                  child: (image == "null")
-                                      ? const Center(
-                                          child: Padding(
-                                            padding: EdgeInsets.all(20),
-                                            child: CircularProgressIndicator(
-                                              color: kWhite,
-                                            ),
-                                          ),
-                                        )
-                                      : (_imageFile == null)
-                                          ? MyNetworkImage(
-                                              imageURL: image,
-                                              width: 100,
-                                              height: 100,
-                                              fit: BoxFit.cover,
+      body: ModalProgressHUD(
+        inAsyncCall: _showSpinner,
+        color: kBlue,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                width: double.infinity,
+                height: 242,
+                decoration: const BoxDecoration(gradient: kGradientBlue),
+                child: SafeArea(
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            SizedBox(
+                              width: 100,
+                              height: 100,
+                              child: Stack(
+                                children: [
+                                  ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: (image == "null")
+                                          ? const Center(
+                                              child: Padding(
+                                                padding: EdgeInsets.all(20),
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color: kWhite,
+                                                ),
+                                              ),
                                             )
-                                          : Image.file(
-                                              _imageFile!,
-                                              width: 120,
-                                              height: 120,
-                                              fit: BoxFit.cover,
-                                            )),
-                              Align(
-                                alignment: Alignment.bottomRight,
-                                child: GestureDetector(
-                                  onTap: _pickImage,
-                                  child: const AppBarButton(
-                                    width: 35,
-                                    height: 35,
-                                    child: Icon(Icons.edit),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
+                                          : (_imageFile == null)
+                                              ? MyNetworkImage(
+                                                  imageURL: image,
+                                                  width: 100,
+                                                  height: 100,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.file(
+                                                  _imageFile!,
+                                                  width: 120,
+                                                  height: 120,
+                                                  fit: BoxFit.cover,
+                                                )),
+                                  Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: GestureDetector(
+                                      onTap: _pickImage,
+                                      child: const AppBarButton(
+                                        width: 35,
+                                        height: 35,
+                                        child: Icon(Icons.edit),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              nama,
+                              style: kSemiBoldTextStyle.copyWith(
+                                  fontSize: 20, color: kWhite),
+                            ),
+                          ],
                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          nama,
-                          style: kSemiBoldTextStyle.copyWith(
-                              fontSize: 20, color: kWhite),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+              Container(
+                width: double.maxFinite,
+                color: kWhite,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 45, horizontal: 20),
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextField(
+                      controller: nameController,
+                      decoration: kTextFieldInputDecoration.copyWith(
+                          hintText: 'Username'),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextField(
+                      controller: emailController,
+                      decoration:
+                          kTextFieldInputDecoration.copyWith(hintText: 'Email'),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const SizedBox(
+                      height: 45,
+                    ),
+                    MainButton(
+                      title: 'Save',
+                      onTap: () async {
+                        await _uploadImage();
+                      },
+                      gradient: kGradientBlue,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    SecondaryButton(
+                      title: 'Batal',
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    Text(
+                      error,
+                      textAlign: TextAlign.center,
+                      style: kSemiBoldTextStyle.copyWith(
+                          color: const Color(0xFFCD1A1A)),
+                    ),
+                  ],
+                ),
+              )
+            ],
           ),
-          Container(
-            width: double.maxFinite,
-            color: kWhite,
-            padding: const EdgeInsets.symmetric(vertical: 45, horizontal: 20),
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 20,
-                ),
-                TextField(
-                  controller: nameController,
-                  decoration:
-                      kTextFieldInputDecoration.copyWith(hintText: 'Username'),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextField(
-                  controller: emailController,
-                  decoration:
-                      kTextFieldInputDecoration.copyWith(hintText: 'Email'),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                const SizedBox(
-                  height: 45,
-                ),
-                MainButton(
-                  title: 'Save',
-                  onTap: () async {
-                    await _uploadImage();
-                  },
-                  gradient: kGradientBlue,
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                SecondaryButton(
-                  title: 'Batal',
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                const SizedBox(
-                  height: 12,
-                ),
-                Text(
-                  error,
-                  textAlign: TextAlign.center,
-                  style: kSemiBoldTextStyle.copyWith(
-                      color: const Color(0xFFCD1A1A)),
-                ),
-              ],
-            ),
-          )
-        ],
+        ),
       ),
     );
   }

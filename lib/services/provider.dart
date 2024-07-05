@@ -24,7 +24,6 @@ class TimerService extends ChangeNotifier {
   int _minutesRemainder = 0;
   int _secondsRemainder = 0;
   late Timer _timer;
-  
 
   bool get isStarted => _isStarted;
   bool get isPaused => _isPaused;
@@ -115,11 +114,10 @@ class TimerService extends ChangeNotifier {
     notifyListeners();
   }
 
-  
   Future<void> _showNotification() async {
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-      'pomodoro_channel',
-      'Pomodoro Notifications',
+      'Smart Driving App',
+      'Time to take a break Notifications',
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -129,7 +127,7 @@ class TimerService extends ChangeNotifier {
         iOS: iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(
       0,
-      'Pomodoro Timer',
+      'Smart Driving App',
       'Time to take a break!',
       platformChannelSpecifics,
     );

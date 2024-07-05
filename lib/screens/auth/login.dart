@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:sdla/components/appbar.dart';
 import 'package:sdla/components/button.dart';
 import 'package:sdla/constants/constant.dart';
@@ -18,10 +19,13 @@ class _LoginState extends State<Login> {
   TextEditingController passwordController = TextEditingController();
   bool _isObscure = true;
   String error = "";
+  bool _showSpinner = false;
 
   Future<void> _login() async {
     error = "";
-    setState(() {});
+    setState(() {
+      _showSpinner = true;
+    });
     Map<String, dynamic> response = {};
     try {
       Map<String, dynamic> data = {
@@ -35,12 +39,16 @@ class _LoginState extends State<Login> {
       print('berhasil login!');
     } catch (e) {
       setState(() {
+         _showSpinner = false;
         error = "Email atau Password salah";
       });
       error = "${response['email'][0]}\n${response['password'][0]}";
       print('Login error: $e');
       print(response);
     }
+    setState(() {
+      _showSpinner = false;
+    });
   }
 
   @override
@@ -48,109 +56,113 @@ class _LoginState extends State<Login> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      body: SizedBox(
-        width: width,
-        height: height,
-        child: SingleChildScrollView(
-          child: SizedBox(
-            height: height,
-            width: width,
-            child: Column(
-              children: [
-                const BackGroundAppBar(),
-                Expanded(
-                  child: Container(
-                    width: double.maxFinite,
-                    height: height,
-                    color: kWhite,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 45, horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        TextField(
-                          controller: emailController,
-                          decoration: kTextFieldInputDecoration.copyWith(
-                              hintText: 'Email'),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        TextField(
-                          controller: passwordController,
-                          obscureText: _isObscure,
-                          decoration: kTextFieldInputDecoration.copyWith(
-                              suffixIcon: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _isObscure = !_isObscure;
-                                    });
-                                  },
-                                  child: Icon(
-                                    (_isObscure)
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: kGreyText,
-                                  ))),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        MainButton(
-                          title: 'Sign In',
-                          onTap: () async {
-                            await _login();
-                            setState(() {});
-                          },
-                        ),
-                        const SizedBox(
-                          height: 12,
-                        ),
-                        Text(
-                          error,
-                          textAlign: TextAlign.center,
-                          style: kSemiBoldTextStyle.copyWith(
-                              color: const Color(0xFFCD1A1A)),
-                        ),
-                        /*
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushReplacementNamed(context, '/signIn');
-                          },
-                          child: Text(
-                            'Lupa password',
-                            style: kMediumTextStyle.copyWith(
-                                decoration: TextDecoration.underline,
-                                decorationColor: kBlue,
-                                fontSize: 14,
-                                color: kBlue),
+      body: ModalProgressHUD(
+        inAsyncCall: _showSpinner,
+        color: kBlue,
+        child: SizedBox(
+          width: width,
+          height: height,
+          child: SingleChildScrollView(
+            child: SizedBox(
+              height: height,
+              width: width,
+              child: Column(
+                children: [
+                  const BackGroundAppBar(),
+                  Expanded(
+                    child: Container(
+                      width: double.maxFinite,
+                      height: height,
+                      color: kWhite,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 45, horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            height: 20,
                           ),
-                        ),*/
-                        const Spacer(),
-                        Text(
-                          'Belum punya akun?',
-                          style: kMediumTextStyle.copyWith(
-                              fontSize: 14, color: kGreyText),
-                        ),
-                        const SizedBox(
-                          height: 12,
-                        ),
-                        SecondaryButton(
-                            title: 'Sign Up',
+                          TextField(
+                            controller: emailController,
+                            decoration: kTextFieldInputDecoration.copyWith(
+                                hintText: 'Email'),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          TextField(
+                            controller: passwordController,
+                            obscureText: _isObscure,
+                            decoration: kTextFieldInputDecoration.copyWith(
+                                suffixIcon: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _isObscure = !_isObscure;
+                                      });
+                                    },
+                                    child: Icon(
+                                      (_isObscure)
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: kGreyText,
+                                    ))),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          MainButton(
+                            title: 'Sign In',
+                            onTap: () async {
+                              await _login();
+                              setState(() {});
+                            },
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          Text(
+                            error,
+                            textAlign: TextAlign.center,
+                            style: kSemiBoldTextStyle.copyWith(
+                                color: const Color(0xFFCD1A1A)),
+                          ),
+                          /*
+                          GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const SignUp()));
-                            })
-                      ],
+                              Navigator.pushReplacementNamed(context, '/signIn');
+                            },
+                            child: Text(
+                              'Lupa password',
+                              style: kMediumTextStyle.copyWith(
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: kBlue,
+                                  fontSize: 14,
+                                  color: kBlue),
+                            ),
+                          ),*/
+                          const Spacer(),
+                          Text(
+                            'Belum punya akun?',
+                            style: kMediumTextStyle.copyWith(
+                                fontSize: 14, color: kGreyText),
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          SecondaryButton(
+                              title: 'Sign Up',
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const SignUp()));
+                              })
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
