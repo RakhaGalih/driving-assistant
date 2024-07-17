@@ -18,6 +18,8 @@ Track your driving hours effortlessly using the integrated calendar feature. Mon
 
 Crafted with Flutter 📱 for a smooth and intuitive user experience, Smart Driver seamlessly integrates with a robust Laravel-based API from [Rakis](https://github.com/Aldi-rakis). Enjoy real-time updates and secure data management for a hassle-free journey.
 
+<br>
+
 Here's the preview :
 
 [Smart Driver preview](https://github.com/user-attachments/assets/233c7dd2-3697-4120-996c-303375a2b624)
